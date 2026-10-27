@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Watchlist at London cinemas</title>
+<link rel="stylesheet" href="report.css">
+</head>
+<body>
+<main>
+<header>
+  <p class="eyebrow" id="eyebrow">London cinemas</p>
+  <h1 id="headline">Finding your films&hellip;</h1>
+  <p class="meta" id="meta"></p>
+  <div class="filters" id="filters" hidden>
+    <label><input type="checkbox" id="filter-fav"> Favourite cinemas</label>
+    <label><input type="checkbox" id="filter-old"> Rescreenings only <span class="hint" id="old-hint"></span></label>
+    <button type="button" class="btn" id="choose-venues">Choose cinemas&hellip;</button>
+    <button type="button" class="btn quiet" id="refresh">Refresh listings</button>
+  </div>
+</header>
+
+<div class="status" id="status" role="status">
+  <p id="status-text">Starting&hellip;</p>
+  <div class="bar"><div id="status-bar"></div></div>
+  <p class="detail" id="status-detail"></p>
+</div>
+<p class="warning" id="warning" hidden></p>
+<div id="results"></div>
+
+<footer>Listings from <a href="https://clusterflick.com" target="_blank" rel="noopener">Clusterflick</a>.
+Matches marked <span class="badge possible">Possible match</span> come from title similarity rather than
+an exact match; hover them for the reasoning. Always check the cinema's own site before travelling.</footer>
+</main>
+
+<dialog id="venue-dialog">
+  <form method="dialog">
+    <h2>Favourite cinemas</h2>
+    <p>Tick the cinemas you like, then use the &ldquo;Favourite cinemas&rdquo; switch to show only those.</p>
+    <input type="search" id="venue-search" placeholder="Search cinemas" autocomplete="off">
+    <ul id="venue-list"></ul>
+    <div class="dialog-actions">
+      <button type="button" class="btn quiet" id="venue-clear">Clear all</button>
+      <button class="btn" id="venue-done">Done</button>
+    </div>
+  </form>
+</dialog>
+<script type="module" src="report.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Watchlist at London Cinemas",
+  "version": "0.1.0",
+  "description": "Click it on your Letterboxd watchlist to see which of your films are showing at London cinemas, and when.",
+  "minimum_chrome_version": "111",
+  "action": {
+    "default_title": "Watchlist at London Cinemas",
+    "default_popup": "popup.html",
+    "default_icon": { "16": "icons/icon16.png", "32": "icons/icon32.png", "48": "icons/icon48.png" }
+  },
+  "icons": { "16": "icons/icon16.png", "32": "icons/icon32.png", "48": "icons/icon48.png", "128": "icons/icon128.png" },
+  "permissions": ["scripting", "storage"],
+  "host_permissions": [
+    "https://letterboxd.com/*",
+    "https://api.github.com/*",
+    "https://github.com/*",
+    "https://*.githubusercontent.com/*"
+  ]
+}
