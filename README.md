@@ -14,10 +14,10 @@ It works in Chrome, and should work in Edge, Brave and other Chromium browsers.
 
 There's no Chrome Web Store listing, so you install it yourself. It takes a minute:
 
-1. Download the zip (`letterboxd-cinemas-extension.zip` from the latest release, or **Code → Download ZIP** on this page) and unzip it somewhere you'll keep it. Chrome reads the extension from that folder, so don't delete it afterwards.
+1. Go to the [latest release](../../releases/latest), download `letterboxd-cinemas-extension.zip` (not the "Source code" archives) and unzip it somewhere you'll keep it. Chrome reads the extension from that folder, so don't delete it afterwards.
 2. In Chrome, go to `chrome://extensions`.
 3. Turn on **Developer mode** (top right).
-4. Click **Load unpacked** and choose the unzipped folder, the one that contains `manifest.json`. If you downloaded the repo with **Download ZIP**, that's the folder inside the zip.
+4. Click **Load unpacked** and choose the unzipped folder, the one that contains `manifest.json`. (If you used **Code → Download ZIP** instead, the folder is one level further down, inside a folder of the same name.)
 5. Click the puzzle-piece icon in Chrome's toolbar and pin **Watchlist at London Cinemas**.
 
 To update, download the new zip, replace the folder's contents, and press the refresh icon on the extension's card at `chrome://extensions`.
