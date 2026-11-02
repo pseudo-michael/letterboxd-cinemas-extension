@@ -6,7 +6,7 @@ A Chrome extension that shows which films on your Letterboxd watchlist are playi
 2. Click the extension, then **Find screenings**.
 3. A page opens with your films, every screening grouped by day, and booking links.
 
-On the page you can tick **Favourite cinemas** (choose yours with **Choose cinemas…**) to show only those, and **Rescreenings only** to hide this year's and last year's releases, so you see the older films that only turn up now and then.
+On the page you can tick **Favourite cinemas** (choose yours with **Choose cinemas…**) to show only those, and **Rescreenings only** to hide this year's and last year's releases, so you see the older films that only turn up now and then. Untick a film's checkbox to hide its screenings; it stays on the page, dimmed, and **Show all films** brings everything back. Your choices are remembered.
 
 It works in Chrome, and should work in Edge, Brave and other Chromium browsers.
 

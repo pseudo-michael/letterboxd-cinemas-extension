@@ -20,6 +20,7 @@ let favourites = new Set();
 let filters = { fav: false, old: false };
 let venues = []; // [{id, name, films}] for the venue picker
 let watchlistSize = 0;
+let unticked = new Set(); // films hidden via their checkbox, by stable key; kept between refreshes
 
 // ---------------------------------------------------------------------------------------
 // Progress
@@ -37,6 +38,7 @@ function setStatus(text, { fraction = null, detail = "" } = {}) {
 function showControls(mode) {
   $("filters").hidden = mode === "none";
   for (const id of ["filter-fav", "filter-old", "choose-venues"]) $(id).closest("label, button").hidden = mode !== "all";
+  if (mode !== "all") $("reset-ticks").hidden = true;
 }
 
 function showError(error) {
@@ -135,6 +137,7 @@ async function run({ refresh }) {
   if (films) {
     $("old-hint").textContent = `hides ${newReleaseCutoff(now)}–${londonYear(now)} releases`;
     showControls("all");
+    for (const card of document.querySelectorAll(".film")) setTicked(card, !unticked.has(card.dataset.key));
     applyFilters();
   } else {
     $("headline").textContent = `None of your ${plural(watchlistSize, "film")} are showing`;
@@ -155,20 +158,29 @@ async function start(options) {
 // Filters
 
 async function saveSettings() {
-  await chrome.storage.local.set({ favouriteVenues: [...favourites], filters });
+  await chrome.storage.local.set({ favouriteVenues: [...favourites], filters, untickedFilms: [...unticked] });
+}
+
+function setTicked(card, ticked) {
+  card.classList.toggle("off", !ticked);
+  card.querySelector(".pick input").checked = ticked;
 }
 
 /** Hides screenings, days and films that don't pass the toggles, and updates every count. */
 function applyFilters() {
   const rows = [...document.querySelectorAll(".rows li")];
+  const cards = [...document.querySelectorAll(".film")];
+  const off = new Set(cards.filter((c) => c.classList.contains("off")).map((c) => c.dataset.film));
   const byFilm = new Map();
   let shown = 0;
   for (const row of rows) {
-    const ok = (!filters.fav || favourites.has(row.dataset.venue)) && (!filters.old || row.dataset.new === "0");
-    row.hidden = !ok;
-    if (!ok) continue;
-    shown++;
-    for (const id of row.dataset.films.split(" ")) {
+    const ids = row.dataset.films.split(" ");
+    const passes = (!filters.fav || favourites.has(row.dataset.venue)) && (!filters.old || row.dataset.new === "0");
+    // A double bill stays while at least one of its films is still ticked.
+    row.hidden = !(passes && ids.some((id) => !off.has(id)));
+    if (!passes) continue;
+    if (!row.hidden) shown++;
+    for (const id of ids) {
       if (!byFilm.has(id)) byFilm.set(id, []);
       byFilm.get(id).push(row);
     }
@@ -178,11 +190,11 @@ function applyFilters() {
   }
 
   let films = 0;
-  for (const card of document.querySelectorAll(".film")) {
+  for (const card of cards) {
     const filmRows = byFilm.get(card.dataset.film);
     card.hidden = !filmRows;
     if (!filmRows) continue;
-    films++;
+    if (!off.has(card.dataset.film)) films++;
     card.querySelector(".count").textContent = plural(filmRows.length, "screening");
     card.querySelector(".next").textContent = filmRows[0].dataset.when;
     card.querySelector("h3 a").href = `#${filmRows[0].id}`;
@@ -201,6 +213,8 @@ function applyFilters() {
   }
   $("filter-fav").checked = filters.fav;
   $("filter-old").checked = filters.old;
+  $("reset-ticks").hidden = off.size === 0;
+  $("reset-ticks").textContent = `Show all films (${off.size} hidden)`;
 }
 
 function buildVenueList() {
@@ -239,6 +253,20 @@ function setupControls() {
     applyFilters();
   });
   $("choose-venues").addEventListener("click", openVenueDialog);
+  $("results").addEventListener("change", (e) => {
+    const card = e.target.closest?.(".film");
+    if (!card || !e.target.matches(".pick input")) return;
+    setTicked(card, e.target.checked);
+    if (e.target.checked) unticked.delete(card.dataset.key); else unticked.add(card.dataset.key);
+    saveSettings();
+    applyFilters();
+  });
+  $("reset-ticks").addEventListener("click", () => {
+    unticked.clear();
+    for (const card of document.querySelectorAll(".film")) setTicked(card, true);
+    saveSettings();
+    applyFilters();
+  });
   $("refresh").addEventListener("click", () => start({ refresh: true }));
 
   $("venue-search").addEventListener("input", (e) => {
@@ -261,8 +289,9 @@ function setupControls() {
 
 // ---------------------------------------------------------------------------------------
 
-const stored = await chrome.storage.local.get(["favouriteVenues", "filters"]);
+const stored = await chrome.storage.local.get(["favouriteVenues", "filters", "untickedFilms"]);
 favourites = new Set(stored.favouriteVenues ?? []);
+unticked = new Set(stored.untickedFilms ?? []);
 filters = { fav: false, old: false, ...stored.filters };
 setupControls();
 start({ refresh: false });

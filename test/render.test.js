@@ -65,3 +65,14 @@ test("fuzzy matches are flagged with their reason; untrusted text is escaped", (
 test("nothing showing gives a friendly message instead of an empty page", () => {
   assert.match(renderResults([], NOW), /None of your films are showing/);
 });
+
+test("each film card has an untick checkbox and a stable key", () => {
+  const l = listing([screening()]);
+  const html = renderResults([
+    { film: film("Double Indemnity", 1944), listing: l, method: "exact", reason: null },
+    { film: { title: "No Link", year: null }, listing: l, method: "exact", reason: null },
+  ], NOW);
+  assert.equal((html.match(/<label class="pick"/g) || []).length, 2);
+  assert.match(html, /data-key="https:\/\/letterboxd\.com\/film\/Double Indemnity\/"/); // the Letterboxd URL when there is one
+  assert.match(html, /data-key="No Link\|"/);                                           // otherwise title and year
+});

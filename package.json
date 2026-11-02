@@ -1,6 +1,6 @@
 {
   "name": "letterboxd-cinemas-extension",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Chrome extension: which films on your Letterboxd watchlist are showing at London cinemas?",

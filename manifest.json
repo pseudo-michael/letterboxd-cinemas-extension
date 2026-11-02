@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Watchlist at London Cinemas",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Click it on your Letterboxd watchlist to see which of your films are showing at London cinemas, and when.",
   "minimum_chrome_version": "111",
   "action": {

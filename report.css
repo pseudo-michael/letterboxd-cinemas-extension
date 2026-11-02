@@ -98,3 +98,11 @@ dialog input[type=search] { font: inherit; padding: 8px 12px; border-radius: 8px
 #venue-list input { accent-color: var(--accent); }
 #venue-list .n { margin-left: auto; color: var(--muted); font-size: 13px; white-space: nowrap; }
 .dialog-actions { display: flex; justify-content: space-between; gap: 8px; }
+
+/* Untick a film to hide its screenings */
+.film .pick { position: absolute; top: 6px; right: 6px; z-index: 2; display: flex; padding: 4px; cursor: pointer; }
+.film .pick input { width: 18px; height: 18px; margin: 0; cursor: pointer; accent-color: var(--accent); }
+.film h3 { padding-right: 26px; }
+.film.off { opacity: .55; }
+.film.off img { filter: grayscale(1); }
+.film.off h3 a { text-decoration: line-through; }
