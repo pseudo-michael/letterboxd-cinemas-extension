@@ -20,6 +20,7 @@ let favourites = new Set();
 let filters = { fav: false, old: false };
 let venues = []; // [{id, name, films}] for the venue picker
 let watchlistSize = 0;
+let view = null; // the film being looked at on its own (like "f12"), or null for the overview
 let unticked = new Set(); // films hidden via their checkbox, by stable key; kept between refreshes
 
 // ---------------------------------------------------------------------------------------
@@ -138,6 +139,7 @@ async function run({ refresh }) {
     $("old-hint").textContent = `hides ${newReleaseCutoff(now)}–${londonYear(now)} releases`;
     showControls("all");
     for (const card of document.querySelectorAll(".film")) setTicked(card, !unticked.has(card.dataset.key));
+    view = viewFromHash(); // also opens a shared #film=… link directly
     applyFilters();
   } else {
     $("headline").textContent = `None of your ${plural(watchlistSize, "film")} are showing`;
@@ -176,8 +178,9 @@ function applyFilters() {
   for (const row of rows) {
     const ids = row.dataset.films.split(" ");
     const passes = (!filters.fav || favourites.has(row.dataset.venue)) && (!filters.old || row.dataset.new === "0");
-    // A double bill stays while at least one of its films is still ticked.
-    row.hidden = !(passes && ids.some((id) => !off.has(id)));
+    // On a film's own page, show just that film (ticked or not). Otherwise a double bill
+    // stays while at least one of its films is still ticked.
+    row.hidden = view ? !(passes && ids.includes(view)) : !(passes && ids.some((id) => !off.has(id)));
     if (!passes) continue;
     if (!row.hidden) shown++;
     for (const id of ids) {
@@ -197,8 +200,10 @@ function applyFilters() {
     if (!off.has(card.dataset.film)) films++;
     card.querySelector(".count").textContent = plural(filmRows.length, "screening");
     card.querySelector(".next").textContent = filmRows[0].dataset.when;
-    card.querySelector("h3 a").href = `#${filmRows[0].id}`;
   }
+  $("films-section").hidden = $("headline").hidden = $("meta").hidden = Boolean(view);
+  $("film-head").hidden = !view;
+  if (view) showHead(view, rows.filter((r) => !r.hidden));
 
   $("headline").textContent = `${films} of your ${watchlistSize} watchlist films ${films === 1 ? "is" : "are"} showing`;
   const count = $("screening-count");
@@ -216,6 +221,50 @@ function applyFilters() {
   $("reset-ticks").hidden = off.size === 0;
   $("reset-ticks").textContent = `Show all films (${off.size} hidden)`;
 }
+
+/** The header of a single film's view: back link, poster, name and a one-line summary. */
+function showHead(id, visibleRows) {
+  const card = document.querySelector(`.film[data-film="${id}"]`);
+  const make = (tag, props = {}, ...children) => {
+    const node = Object.assign(document.createElement(tag), props);
+    node.append(...children);
+    return node;
+  };
+  const year = card.querySelector(".year");
+  const cinemas = new Set(visibleRows.map((r) => r.dataset.venue)).size;
+  const info = make("p", { className: "ft-info", textContent: visibleRows.length
+    ? `${plural(visibleRows.length, "screening")} at ${plural(cinemas, "cinema")} · next ${visibleRows[0].dataset.when}`
+    : "No screenings match your filters." });
+  const letterboxd = card.querySelector(".letterboxd");
+  if (letterboxd) info.append(" · ", letterboxd.cloneNode(true));
+  const badge = card.querySelector(".badge");
+  if (badge) info.append(" ", badge.cloneNode(true));
+  $("film-head").replaceChildren(
+    make("a", { className: "back", href: "#", textContent: "← All films" }),
+    make("div", { className: "film-title" },
+      card.querySelector("img, .no-poster").cloneNode(true),
+      make("div", {}, make("p", { className: "ft-name" }, card.querySelector("h3 a").textContent, ...(year ? [" ", year.cloneNode(true)] : [])), info)),
+  );
+}
+
+function viewFromHash() {
+  const m = /^#film=(f\d+)$/.exec(location.hash);
+  return m && document.querySelector(`.film[data-film="${m[1]}"]`) ? m[1] : null;
+}
+
+// Opening a film changes the URL hash, so the browser's back button returns to the overview.
+window.addEventListener("hashchange", () => {
+  const next = viewFromHash();
+  if (next === view) return;
+  const left = view;
+  view = next;
+  applyFilters();
+  if (view) window.scrollTo(0, 0);
+  else {
+    const card = left && document.querySelector(`.film[data-film="${left}"]`);
+    if (card && !card.hidden) card.scrollIntoView({ block: "center" });
+  }
+});
 
 function buildVenueList() {
   const list = $("venue-list");

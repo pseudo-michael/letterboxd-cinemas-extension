@@ -36,7 +36,9 @@ test("results include a card and a row per screening, with filter data", () => {
   assert.match(html, /data-new="0"/); // 1944 is a rescreening
   assert.match(html, /Sold out/);
   assert.match(html, /image\.tmdb\.org\/t\/p\/w154\/p\.jpg/);
-  assert.match(html, /<a href="#s0">Double Indemnity<\/a>/); // card jumps to the first screening
+  assert.match(html, /<a href="#film=f0">Double Indemnity<\/a>/); // card opens that film's own view
+  assert.match(html, /<section id="films-section">/);
+  assert.match(html, /<div class="film-head" id="film-head" hidden>/);
   assert.match(html, /next <span class="next">Wed 28 Oct, 18:15<\/span>/);
 });
 

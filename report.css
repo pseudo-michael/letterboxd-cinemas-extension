@@ -106,3 +106,13 @@ dialog input[type=search] { font: inherit; padding: 8px 12px; border-radius: 8px
 .film.off { opacity: .55; }
 .film.off img { filter: grayscale(1); }
 .film.off h3 a { text-decoration: line-through; }
+
+/* One film's own view */
+.back { display: inline-block; margin-bottom: 14px; font-size: 14px; color: var(--muted); text-decoration: none; }
+.back:hover { color: var(--text); text-decoration: underline; }
+.film-head { margin: 8px 0 0; }
+.film-title { display: flex; gap: 16px; align-items: center; }
+.film-title img, .film-title .no-poster { width: 72px; height: 108px; border-radius: 6px; object-fit: cover; flex: none; }
+.ft-name { margin: 0 0 4px; font-size: clamp(22px, 5vw, 30px); font-weight: 700; line-height: 1.15; letter-spacing: -.01em; }
+.ft-name .year { font-weight: 400; }
+.ft-info { margin: 0; color: var(--muted); font-size: 14px; }
